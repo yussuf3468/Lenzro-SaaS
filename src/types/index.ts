@@ -2,7 +2,8 @@ export interface Product {
   id: string;
   product_id: string;
   name: string;
-  category: string;
+  category_id: string;
+  category?: { name: string; color: string; icon: string | null }; // Joined from product_categories
   image_url: string | null;
   buying_price: number;
   selling_price: number;

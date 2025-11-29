@@ -19,8 +19,12 @@ import {
   CreditCard,
   TrendingUp,
   RotateCcw,
+  Building2,
+  Crown,
+  FolderOpen,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useSaaS } from "../contexts/SaaSContext";
 import { usePendingOrdersCount } from "../hooks/useSupabaseQuery";
 
 interface LayoutProps {
@@ -35,6 +39,7 @@ export default function Layout({
   onTabChange,
 }: LayoutProps) {
   const { user, signOut } = useAuth();
+  const { hasModule, currentUserRole } = useSaaS();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed] =
     useState(true);
@@ -42,14 +47,14 @@ export default function Layout({
   // ✅ Use cached query for pending orders count (reduces egress costs)
   const { data: pendingOrdersCount = 0 } = usePendingOrdersCount();
 
-  // Check if current user is admin or staff (mutually exclusive)
-  const isAdmin = user?.email === "galiyowabi@gmail.com";
-  const isStaff = user?.email === "khalid123@gmail.com";
+  // Check if current user is admin or staff based on role
+  const isAdmin = currentUserRole === "owner" || currentUserRole === "admin";
+  const isStaff = currentUserRole === "staff" || currentUserRole === "manager";
 
-  // Dynamic tabs based on user role
+  // Dynamic tabs based on user role AND enabled modules
   const baseTabs = [
     // Only show one dashboard tab per role
-    ...(isAdmin
+    ...(isAdmin && hasModule("analytics")
       ? [
           {
             id: "dashboard",
@@ -69,57 +74,99 @@ export default function Layout({
           },
         ]
       : []),
-    {
-      id: "inventory",
-      label: "Inventory",
-      icon: Package,
-      color: "from-blue-600 to-cyan-600",
-    },
-    {
-      id: "cyber-services",
-      label: "Adeegyada Cyber-ka",
-      icon: Monitor,
-      color: "from-cyan-600 to-blue-600",
-    },
-    {
-      id: "sales",
-      label: "Iibka",
-      icon: ShoppingCart,
-      color: "from-emerald-600 to-teal-600",
-    },
-    {
-      id: "returns",
-      label: "Soo Celinta",
-      icon: RotateCcw,
-      color: "from-rose-600 to-red-600",
-    },
+    ...(hasModule("inventory")
+      ? [
+          {
+            id: "inventory",
+            label: "Inventory",
+            icon: Package,
+            color: "from-blue-600 to-cyan-600",
+          },
+          {
+            id: "categories",
+            label: "Categories",
+            icon: FolderOpen,
+            color: "from-indigo-600 to-purple-600",
+          },
+        ]
+      : []),
+    ...(hasModule("cyber_services")
+      ? [
+          {
+            id: "cyber-services",
+            label: "Adeegyada Cyber-ka",
+            icon: Monitor,
+            color: "from-cyan-600 to-blue-600",
+          },
+        ]
+      : []),
+    ...(hasModule("pos")
+      ? [
+          {
+            id: "sales",
+            label: "Iibka",
+            icon: ShoppingCart,
+            color: "from-emerald-600 to-teal-600",
+          },
+          {
+            id: "returns",
+            label: "Soo Celinta",
+            icon: RotateCcw,
+            color: "from-rose-600 to-red-600",
+          },
+        ]
+      : []),
     {
       id: "search",
       label: "Raadi Alaabta",
       icon: Search,
       color: "from-violet-600 to-purple-600",
     },
-    {
-      id: "customer-credit",
-      label: "Deynta Macaamiisha",
-      icon: CreditCard,
-      color: "from-teal-600 to-cyan-600",
-    },
+    ...(hasModule("customers")
+      ? [
+          {
+            id: "customer-credit",
+            label: "Deynta Macaamiisha",
+            icon: CreditCard,
+            color: "from-teal-600 to-cyan-600",
+          },
+        ]
+      : []),
   ];
 
   const adminTabs = [
+    ...(hasModule("orders")
+      ? [
+          {
+            id: "orders",
+            label: "Dalabyada",
+            icon: ClipboardList,
+            color: "from-orange-600 to-amber-600",
+          },
+        ]
+      : []),
     {
-      id: "orders",
-      label: "Dalabyada",
-      icon: ClipboardList,
-      color: "from-orange-600 to-amber-600",
+      id: "subscription",
+      label: "Subscription",
+      icon: Crown,
+      color: "from-purple-600 to-pink-600",
     },
     {
-      id: "financial-dashboard",
-      label: "Guddi Maaliyadeed",
-      icon: LayoutDashboard,
-      color: "from-cyan-600 to-blue-600",
+      id: "organization",
+      label: "Organization",
+      icon: Building2,
+      color: "from-indigo-600 to-purple-600",
     },
+    ...(hasModule("analytics")
+      ? [
+          {
+            id: "financial-dashboard",
+            label: "Guddi Maaliyadeed",
+            icon: LayoutDashboard,
+            color: "from-cyan-600 to-blue-600",
+          },
+        ]
+      : []),
     {
       id: "expenses",
       label: "Kharashyada",
@@ -138,18 +185,16 @@ export default function Layout({
       icon: Banknote,
       color: "from-amber-600 to-yellow-600",
     },
-    {
-      id: "reports",
-      label: "Warbixinnada",
-      icon: FileText,
-      color: "from-indigo-600 to-blue-600",
-    },
-    // {
-    //   id: "user-activity",
-    //   label: "Staff Activity",
-    //   icon: Activity,
-    //   color: "from-rose-600 to-pink-600",
-    // },
+    ...(hasModule("reports")
+      ? [
+          {
+            id: "reports",
+            label: "Warbixinnada",
+            icon: FileText,
+            color: "from-indigo-600 to-blue-600",
+          },
+        ]
+      : []),
   ];
 
   const tabs = isAdmin ? [...baseTabs, ...adminTabs] : baseTabs;
@@ -158,10 +203,11 @@ export default function Layout({
   // No need for manual fetching - React Query auto-refetches every 2 minutes
 
   const getStaffName = (email: string) => {
-    if (email.includes("galiyowabi") || email.includes("admin"))
-      return "Mohamed Mohamud (Admin)";
-    if (email.includes("khaled")) return "Khaled";
-    return email.split("@")[0];
+    // Return the part before @ as display name
+    return email
+      .split("@")[0]
+      .replace(/[._]/g, " ")
+      .replace(/\b\w/g, (l) => l.toUpperCase());
   };
 
   const handleLogout = async () => {
@@ -173,16 +219,16 @@ export default function Layout({
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-secondary-900 via-secondary-800 to-secondary-900">
       {/* Animated Background Elements - Luxury */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary-500/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
         <div
-          className="absolute -bottom-40 -left-40 w-[30rem] h-[30rem] bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse"
+          className="absolute -bottom-40 -left-40 w-[30rem] h-[30rem] bg-gradient-to-br from-accent-500/15 to-cyan-500/15 rounded-full blur-3xl animate-pulse"
           style={{ animationDelay: "1s" }}
         ></div>
         <div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 rounded-full blur-3xl"
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-primary-500/15 to-blue-500/15 rounded-full blur-3xl"
           style={{ animation: "pulse 8s ease-in-out infinite" }}
         ></div>
       </div>
@@ -193,13 +239,13 @@ export default function Layout({
           isDesktopSidebarCollapsed ? "w-20" : "w-72 xl:w-80"
         }`}
       >
-        <div className="h-full bg-gradient-to-b from-slate-900/95 via-purple-900/95 to-slate-900/95 backdrop-blur-2xl border-r border-white/20 shadow-2xl overflow-y-auto scrollbar-hide relative">
+        <div className="h-full bg-gradient-to-b from-secondary-900/98 via-secondary-800/98 to-secondary-900/98 backdrop-blur-2xl border-r border-white/10 shadow-2xl overflow-y-auto scrollbar-hide relative">
           {/* Collapse Toggle Button - Enhanced Visibility */}
           <button
             onClick={() =>
               setIsDesktopSidebarCollapsed(!isDesktopSidebarCollapsed)
             }
-            className="fixed bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 p-2 rounded-full shadow-2xl shadow-purple-500/50 hover:shadow-purple-400/70 hover:scale-125 transition-all duration-200 z-50 ring-2 ring-white/30 hover:ring-white/50"
+            className="fixed bg-gradient-to-br from-primary-500 to-primary-600 hover:from-primary-400 hover:to-primary-500 p-2 rounded-full shadow-2xl shadow-primary-500/50 hover:shadow-primary-400/70 hover:scale-125 transition-all duration-200 z-50 ring-2 ring-white/30 hover:ring-white/50"
             style={{
               top: isDesktopSidebarCollapsed ? "50%" : "24px",
               left: isDesktopSidebarCollapsed ? "68px" : "calc(18rem - 12px)",
@@ -224,17 +270,15 @@ export default function Layout({
               <>
                 <div className="hidden lg:flex items-center space-x-3 mb-4">
                   <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="relative bg-gradient-to-br from-purple-600 to-pink-600 p-3 rounded-2xl shadow-xl">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="relative bg-gradient-to-br from-primary-600 to-primary-700 p-3 rounded-2xl shadow-xl">
                       <Package className="w-6 h-6 text-white" />
                     </div>
                   </div>
                   <div>
-                    <h1 className="text-lg font-black text-white">
-                      AL-KALAM BOOKS
-                    </h1>
-                    <p className="text-xs text-purple-300 font-medium">
-                      Bookshop & Cyber
+                    <h1 className="text-lg font-black text-white">LENZRO</h1>
+                    <p className="text-xs text-primary-300 font-medium">
+                      Multi-Industry Platform
                     </p>
                   </div>
                 </div>
@@ -244,8 +288,8 @@ export default function Layout({
                   <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-3">
                     <div className="flex items-center space-x-3">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full blur opacity-75"></div>
-                        <div className="relative bg-gradient-to-br from-emerald-500 to-teal-500 p-2 rounded-full border-2 border-white/20">
+                        <div className="absolute inset-0 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full blur opacity-75"></div>
+                        <div className="relative bg-gradient-to-br from-accent-500 to-accent-600 p-2 rounded-full border-2 border-white/20">
                           <User className="w-4 h-4 text-white" />
                         </div>
                       </div>
@@ -253,7 +297,7 @@ export default function Layout({
                         <p className="text-sm font-bold text-white truncate">
                           {getStaffName(user.email || "")}
                         </p>
-                        <p className="text-xs text-purple-300">
+                        <p className="text-xs text-primary-300">
                           {isAdmin ? "Administrator" : "Staff"}
                         </p>
                       </div>
@@ -263,7 +307,7 @@ export default function Layout({
               </>
             ) : (
               <div className="flex justify-center">
-                <div className="relative bg-gradient-to-br from-purple-600 to-pink-600 p-3 rounded-2xl shadow-xl">
+                <div className="relative bg-gradient-to-br from-primary-600 to-primary-700 p-3 rounded-2xl shadow-xl">
                   <Package className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -391,10 +435,10 @@ export default function Layout({
                 </div>
                 <div className="hidden sm:block min-w-0">
                   <h1 className="text-sm font-black text-white truncate max-w-[160px]">
-                    AL-KALAM BOOKS
+                    LENZRO
                   </h1>
                   <p className="text-xs text-purple-300 font-medium">
-                    ERP System
+                    Business Management
                   </p>
                 </div>
               </div>
@@ -547,8 +591,7 @@ export default function Layout({
             <div className="px-3 sm:px-4 lg:px-6 max-w-[1600px] mx-auto">
               <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2 text-xs sm:text-sm text-slate-300">
                 <p className="text-center sm:text-left">
-                  © {new Date().getFullYear()} Al-Qalam Bookshop. All rights
-                  reserved.
+                  © {new Date().getFullYear()} Lenzro. All rights reserved.
                 </p>
                 <div className="flex items-center gap-2">
                   <span className="text-slate-400">

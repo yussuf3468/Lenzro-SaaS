@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8' ?>
 <resources>
-    <string name="app_name">Al Kalam Books</string>
-    <string name="title_activity_main">Al Kalam Books</string>
-    <string name="package_name">com.lenzro.erp</string>
-    <string name="custom_url_scheme">com.lenzro.erp</string>
+    <string name="app_name">Lenzro</string>
+    <string name="title_activity_main">Lenzro</string>
+    <string name="package_name">com.lenzro.app</string>
+    <string name="custom_url_scheme">com.lenzro.app</string>
 </resources>

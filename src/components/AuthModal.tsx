@@ -115,7 +115,7 @@ const AuthModal = memo(({ isOpen, onClose }: AuthModalProps) => {
             <p className="text-slate-300 text-sm">
               {mode === "signin"
                 ? "Sign in to your account"
-                : "Join Zakaria's BookShop today"}
+                : "Join our platform today"}
             </p>
           </div>
           <button

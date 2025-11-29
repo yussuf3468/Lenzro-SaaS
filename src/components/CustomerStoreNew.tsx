@@ -555,7 +555,7 @@ export default function CustomerStore({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">AL-KALAM BOOKS</h3>
+              <h3 className="text-xl font-bold mb-4">LENZRO</h3>
               <p className="text-slate-300">
                 Your trusted partner for books, stationery, and more. Quality
                 products, fast delivery, best prices.
@@ -608,8 +608,7 @@ export default function CustomerStore({
           <div className="border-t border-slate-700 mt-8 pt-8">
             <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-3 text-sm">
               <p className="text-slate-400 text-center sm:text-left">
-                &copy; {new Date().getFullYear()} AL-KALAM BOOKS. All rights
-                reserved.
+                &copy; {new Date().getFullYear()} Lenzro. All rights reserved.
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-slate-500">Powered by</span>

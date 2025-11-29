@@ -72,7 +72,7 @@ export default function CustomerStore({ onCheckout }: CustomerStoreProps) {
           <p className="text-xl font-semibold text-slate-700">
             Loading products...
           </p>
-          <p className="text-slate-500">Iska sug - Please wait</p>
+          <p className="text-slate-500">Please wait...</p>
         </div>
       </div>
     );
@@ -86,7 +86,7 @@ export default function CustomerStore({ onCheckout }: CustomerStoreProps) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-slate-800 via-blue-600 to-purple-600 bg-clip-text text-transparent">
-                AL-KALAM BOOKS
+                LENZRO
               </h1>
               <p className="text-slate-600 mt-1">
                 Dukaan Online - Online Store

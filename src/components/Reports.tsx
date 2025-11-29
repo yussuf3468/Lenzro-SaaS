@@ -85,7 +85,7 @@ export default function Reports() {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont("helvetica", "bold");
-    doc.text("AL KALAM BOOKSHOP", 105, 15, { align: "center" });
+    doc.text("BUSINESS REPORT", 105, 15, { align: "center" });
 
     doc.setFontSize(16);
     doc.text("Inventory Report", 105, 25, { align: "center" });
@@ -194,7 +194,7 @@ export default function Reports() {
           pageHeight - 10
         );
         doc.text(
-          "Al Kalam Bookshop - Confidential",
+          "Business Report - Confidential",
           pageSize.width / 2,
           pageHeight - 10,
           { align: "center" }

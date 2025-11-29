@@ -49,9 +49,9 @@ export default function Login({ onLogin }: LoginProps) {
   }
 
   //   const staffAccounts = [
-  //     { name: "Hassan (Owner)", role: "Manager", email: "hassan@bookshop.ke" },
-  //     { name: "Zakaria", role: "Staff", email: "zakaria@bookshop.ke" },
-  //     { name: "Khaled", role: "Staff", email: "khaled@bookshop.ke" },
+  //     { name: "John Doe (Owner)", role: "Manager", email: "john@company.com" },
+  //     { name: "Jane Smith", role: "Staff", email: "jane@company.com" },
+  //     { name: "Bob Wilson", role: "Staff", email: "bob@company.com" },
   //   ];
 
   return (
@@ -81,7 +81,7 @@ export default function Login({ onLogin }: LoginProps) {
               </div>
             </div>
             <h1 className="text-3xl font-black bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-              AL-KALAM BOOKS
+              LENZRO
             </h1>
             <p className="text-slate-600 font-medium mt-2">
               Gal Nidaamka - Staff Login System

@@ -11,7 +11,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.lenzro.erp"
+    namespace "com.lenzro.app"
     compileSdk rootProject.ext.compileSdkVersion
 
     // Use Java 21 for compilation (required by @capacitor/android 7.x)
@@ -32,7 +32,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.lenzro.erp"
+        applicationId "com.lenzro.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

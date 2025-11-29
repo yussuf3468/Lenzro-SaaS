@@ -1,5 +1,5 @@
 /**
- * Performance monitoring utilities for AL-KALAM BOOKS
+ * Performance monitoring utilities for Lenzro SaaS
  */
 
 export interface PerformanceMetrics {

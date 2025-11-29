@@ -69,7 +69,10 @@ export default function Dashboard() {
         (sum, s) => sum + s.total_sale,
         0
       );
-      const dailyProfit = dailySalesRecords.reduce((sum, s) => sum + s.profit, 0);
+      const dailyProfit = dailySalesRecords.reduce(
+        (sum, s) => sum + s.profit,
+        0
+      );
 
       setStats({
         totalSales,
@@ -126,13 +129,13 @@ export default function Dashboard() {
           <div className="text-center space-y-2">
             <div className="inline-block">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-pink-200">
-                AL-KALAM BOOKS
+                LENZRO
               </h1>
             </div>
             <p className="text-xs md:text-sm text-slate-200 font-medium max-w-3xl mx-auto">
-              ✨ Ku soo dhowow Dashboard-ka AL-KALAM BOOKS — Halka aad ku
-              maamusho alaabta, iibka, iyo shaqaalaha. La soco xogta
-              waqtiga-dhabta ah si aad ganacsigaaga hore ugu waddo!
+              ✨ Welcome to Lenzro — Your Premium Business Management Platform.
+              Monitor inventory, sales, and team performance with real-time
+              insights to grow your business!
             </p>
 
             <div className="flex items-center justify-center space-x-2 text-emerald-400">

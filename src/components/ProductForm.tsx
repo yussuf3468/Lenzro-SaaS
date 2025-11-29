@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { X, Upload } from "lucide-react";
+import { X, Upload, FolderPlus } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { useSaaS } from "../contexts/SaaSContext";
 import type { Product } from "../types";
 
 interface ProductFormProps {
@@ -9,44 +10,25 @@ interface ProductFormProps {
   onSuccess: () => void;
 }
 
-const categories = [
-  "Books",
-  "Backpacks",
-  "Bottles",
-  "Electronics",
-  "Pens",
-  "Notebooks",
-  "Pencils",
-  "Erasers",
-  "Markers",
-  "Quran",
-  "Print pepa",
-  "Office fell",
-  "Lunch box",
-  "Bags",
-  "Sabuurad",
-  "Ink",
-  "Water color",
-  "Crayons",
-  "Kutub elmi",
-  "Tarmus",
-  "Cup hot",
-  "Speaker",
-  "Locks/Qufulo",
-  "Malab/Honey",
-  "Other",
-];
-
+interface Category {
+  id: string;
+  name: string;
+  color: string;
+  icon: string | null;
+}
 
 export default function ProductForm({
   product,
   onClose,
   onSuccess,
 }: ProductFormProps) {
+  const { currentOrganization } = useSaaS();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [formData, setFormData] = useState({
     product_id: "",
     name: "",
-    category: "Electronics",
+    category_id: "",
     image_url: "",
     buying_price: "",
     selling_price: "",
@@ -58,12 +40,39 @@ export default function ProductForm({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!currentOrganization?.id) return;
+
+      setLoadingCategories(true);
+      try {
+        const { data, error } = await supabase
+          .from("product_categories")
+          .select("id, name, color, icon")
+          .eq("organization_id", currentOrganization.id)
+          .eq("is_active", true)
+          .order("display_order", { ascending: true });
+
+        if (error) throw error;
+        setCategories(data || []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, [currentOrganization?.id]);
+
+  // Set form data when product changes
   useEffect(() => {
     if (product) {
       setFormData({
         product_id: product.product_id,
         name: product.name,
-        category: product.category,
+        category_id: product.category_id || "",
         image_url: product.image_url || "",
         buying_price: product.buying_price.toString(),
         selling_price: product.selling_price.toString(),
@@ -124,7 +133,7 @@ export default function ProductForm({
       const data = {
         product_id: formData.product_id,
         name: formData.name,
-        category: formData.category,
+        category_id: formData.category_id,
         image_url: imageUrl || null,
         buying_price: parseFloat(formData.buying_price),
         selling_price: parseFloat(formData.selling_price),
@@ -207,27 +216,58 @@ export default function ProductForm({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Category *
-                </label>
-                <select
-                  required
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
-                >
-                  {categories.map((cat) => (
-                    <option
-                      key={cat}
-                      value={cat}
-                      className="bg-slate-900 text-white"
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-slate-300">
+                    Category *
+                  </label>
+                  {categories.length === 0 && !loadingCategories && (
+                    <a
+                      href="/categories"
+                      className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onClose();
+                        window.location.href = "/categories";
+                      }}
                     >
-                      {cat}
+                      <FolderPlus className="w-3 h-3" />
+                      Add Categories
+                    </a>
+                  )}
+                </div>
+
+                {loadingCategories ? (
+                  <div className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-slate-400">
+                    Loading categories...
+                  </div>
+                ) : categories.length === 0 ? (
+                  <div className="w-full px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-300 text-sm">
+                    No categories found. Please create categories first.
+                  </div>
+                ) : (
+                  <select
+                    required
+                    value={formData.category_id}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category_id: e.target.value })
+                    }
+                    className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-white"
+                  >
+                    <option value="" className="bg-slate-900 text-slate-400">
+                      Select a category
                     </option>
-                  ))}
-                </select>
+                    {categories.map((cat) => (
+                      <option
+                        key={cat.id}
+                        value={cat.id}
+                        className="bg-slate-900 text-white"
+                      >
+                        {cat.icon ? `${cat.icon} ` : ""}
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div>

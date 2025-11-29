@@ -265,8 +265,22 @@ export default function Inventory() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-600/20 text-blue-400 border border-blue-500/30">
-                          {product.category}
+                        <span
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border"
+                          style={{
+                            backgroundColor: product.category?.color
+                              ? `${product.category.color}20`
+                              : "#1e40af20",
+                            borderColor: product.category?.color
+                              ? `${product.category.color}50`
+                              : "#3b82f650",
+                            color: product.category?.color || "#60a5fa",
+                          }}
+                        >
+                          {product.category?.icon && (
+                            <span>{product.category.icon}</span>
+                          )}
+                          {product.category?.name || "Uncategorized"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-slate-200 font-semibold">
@@ -374,8 +388,11 @@ export default function Inventory() {
                         <p className="text-sm text-slate-400">
                           ID: {product.product_id}
                         </p>
-                        <p className="text-sm text-slate-300">
-                          {product.category}
+                        <p className="text-sm text-slate-300 flex items-center gap-1">
+                          {product.category?.icon && (
+                            <span>{product.category.icon}</span>
+                          )}
+                          {product.category?.name || "Uncategorized"}
                         </p>
                       </div>
                       <div className="flex items-center space-x-2 ml-2">
@@ -502,9 +519,23 @@ export default function Inventory() {
                   <div className="space-y-6">
                     {/* Category Badge */}
                     <div>
-                      <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                        <Tag className="w-4 h-4 mr-2" />
-                        {viewingProduct.category}
+                      <span
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border"
+                        style={{
+                          backgroundColor: viewingProduct.category?.color
+                            ? `${viewingProduct.category.color}20`
+                            : "#3b82f620",
+                          borderColor: viewingProduct.category?.color
+                            ? `${viewingProduct.category.color}50`
+                            : "#60a5fa50",
+                          color: viewingProduct.category?.color || "#93c5fd",
+                        }}
+                      >
+                        <Tag className="w-4 h-4" />
+                        {viewingProduct.category?.icon && (
+                          <span>{viewingProduct.category.icon}</span>
+                        )}
+                        {viewingProduct.category?.name || "Uncategorized"}
                       </span>
                     </div>
 

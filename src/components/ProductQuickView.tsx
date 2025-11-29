@@ -45,7 +45,7 @@ const ProductQuickView = memo(
       if (navigator.share) {
         navigator.share({
           title: product.name,
-          text: `Check out ${product.name} at Hassan Muse BookShop`,
+          text: `Check out ${product.name}`,
           url: window.location.href,
         });
       } else {

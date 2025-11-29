@@ -1,5 +1,6 @@
 import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
+import { useSaaS } from "../contexts/SaaSContext";
 import type { Product } from "../types";
 
 /**
@@ -65,171 +66,292 @@ export function useSupabaseQueryDirect<T = any>(
 }
 
 /**
- * Hook for products data with caching
+ * Hook for products data with caching (MULTI-TENANT)
  */
 export function useProducts() {
+  const { currentOrganization } = useSaaS();
+
   return useSupabaseQuery<Product[]>(
-    "products",
-    async () => await supabase.from("products").select("*")
-  );
-}
-
-/**
- * Hook for sales data with caching
- * Use manual refresh button to update data and save egress costs
- */
-export function useSales() {
-  return useSupabaseQuery<any[]>(
-    "sales",
-    async () =>
-      await supabase
-        .from("sales")
-        .select("*")
-        .order("created_at", { ascending: false })
-    // ✅ No auto-refetch - use manual Refresh button to save costs!
-  );
-}
-
-/**
- * Hook for orders data with caching
- */
-export function useOrders() {
-  return useSupabaseQuery<any[]>(
-    "orders",
-    async () => await supabase.from("orders").select("*, order_items(*)")
-  );
-}
-
-/**
- * Hook for pending orders count (NO AUTO-REFETCH - save egress!)
- */
-export function usePendingOrdersCount() {
-  return useSupabaseQueryDirect(
-    "pending-orders-count",
+    ["products", currentOrganization?.id],
     async () => {
-      const { count, error } = await supabase
-        .from("orders")
-        .select("*", { count: "exact", head: true })
-        .in("status", ["pending", "confirmed"]);
+      if (!currentOrganization) return { data: [], error: null };
 
-      if (error) {
-        console.error("Error fetching pending orders count:", error);
-        return 0; // Return 0 on error instead of undefined
-      }
+      const { data, error } = await (supabase as any)
+        .from("products")
+        .select(
+          `
+          *,
+          category:product_categories(name, color, icon)
+        `
+        )
+        .eq("organization_id", currentOrganization.id);
 
-      return count ?? 0; // Use nullish coalescing to ensure never undefined
+      return { data, error };
     },
     {
-      staleTime: Infinity, // NEVER refetch automatically - infinite cache!
-      refetchInterval: false, // ❌ DISABLED auto-polling - saves 100+ requests/day!
+      enabled: !!currentOrganization,
     }
   );
 }
 
 /**
- * Hook for customer credits with caching
+ * Hook for sales data with caching (MULTI-TENANT)
+ * Use manual refresh button to update data and save egress costs
+ */
+export function useSales() {
+  const { currentOrganization } = useSaaS();
+
+  return useSupabaseQuery<any[]>(
+    ["sales", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
+        .from("sales")
+        .select("*")
+        .eq("organization_id", currentOrganization.id)
+        .order("created_at", { ascending: false });
+    },
+    {
+      enabled: !!currentOrganization,
+    }
+  );
+}
+
+/**
+ * Hook for orders data with caching (MULTI-TENANT)
+ */
+export function useOrders() {
+  const { currentOrganization } = useSaaS();
+
+  return useSupabaseQuery<any[]>(
+    ["orders", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
+        .from("orders")
+        .select("*, order_items(*)")
+        .eq("organization_id", currentOrganization.id);
+    },
+    {
+      enabled: !!currentOrganization,
+    }
+  );
+}
+
+/**
+ * Hook for pending orders count (MULTI-TENANT)
+ */
+export function usePendingOrdersCount() {
+  const { currentOrganization } = useSaaS();
+
+  return useSupabaseQueryDirect(
+    ["pending-orders-count", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return 0;
+
+      const { count, error } = await (supabase as any)
+        .from("orders")
+        .select("*", { count: "exact", head: true })
+        .eq("organization_id", currentOrganization.id)
+        .in("status", ["pending", "confirmed"]);
+
+      if (error) {
+        console.error("Error fetching pending orders count:", error);
+        return 0;
+      }
+
+      return count ?? 0;
+    },
+    {
+      enabled: !!currentOrganization,
+      staleTime: Infinity,
+      refetchInterval: false,
+    }
+  );
+}
+
+/**
+ * Hook for customer credits with caching (MULTI-TENANT)
  */
 export function useCustomerCredits() {
-  return useSupabaseQueryDirect("customer-credits", async () => {
-    const { data: credits, error } = await supabase
-      .from("customer_credits" as any)
-      .select("*")
-      .order("created_at", { ascending: false });
+  const { currentOrganization } = useSaaS();
 
-    if (error) throw error;
-    return credits || [];
-  });
+  return useSupabaseQueryDirect(
+    ["customer-credits", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return [];
+
+      const { data: credits, error } = await (supabase as any)
+        .from("customer_credits")
+        .select("*")
+        .eq("organization_id", currentOrganization.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return credits || [];
+    },
+    {
+      enabled: !!currentOrganization,
+    }
+  );
 }
 
 /**
- * Hook for credit payments with caching
+ * Hook for credit payments with caching (MULTI-TENANT)
  */
 export function useCreditPayments() {
-  return useSupabaseQueryDirect("credit-payments", async () => {
-    const { data: payments, error } = await supabase
-      .from("credit_payments" as any)
-      .select("*")
-      .order("payment_date", { ascending: false });
+  const { currentOrganization } = useSaaS();
 
-    if (error) throw error;
-    return payments || [];
-  });
+  return useSupabaseQueryDirect(
+    ["credit-payments", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return [];
+
+      const { data: payments, error } = await (supabase as any)
+        .from("credit_payments")
+        .select("*")
+        .eq("organization_id", currentOrganization.id)
+        .order("payment_date", { ascending: false });
+
+      if (error) throw error;
+      return payments || [];
+    },
+    {
+      enabled: !!currentOrganization,
+    }
+  );
 }
 
 /**
- * Hook for expenses with caching
+ * Hook for expenses with caching (MULTI-TENANT)
  */
 export function useExpenses() {
+  const { currentOrganization } = useSaaS();
+
   return useSupabaseQuery<any[]>(
-    "expenses",
-    async () =>
-      await supabase.from("expenses").select("*, expense_categories(name)")
+    ["expenses", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
+        .from("expenses")
+        .select("*, expense_categories(name)")
+        .eq("organization_id", currentOrganization.id);
+    },
+    {
+      enabled: !!currentOrganization,
+    }
   );
 }
 
 /**
- * Hook for debts with caching
+ * Hook for debts with caching (MULTI-TENANT)
  */
 export function useDebts() {
+  const { currentOrganization } = useSaaS();
+
   return useSupabaseQuery<any[]>(
-    "debts",
-    async () => await supabase.from("debts").select("*")
+    ["debts", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
+        .from("debts")
+        .select("*")
+        .eq("organization_id", currentOrganization.id);
+    },
+    {
+      enabled: !!currentOrganization,
+    }
   );
 }
 
 /**
- * Hook for publicly visible products (published and in stock) with caching
+ * Hook for publicly visible products (published and in stock) with caching (MULTI-TENANT)
  */
 export function usePublicProducts() {
+  const { currentOrganization } = useSaaS();
+
   return useSupabaseQuery<Product[]>(
-    "public-products",
-    async () =>
-      await supabase
+    ["public-products", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
         .from("products")
         .select("*")
+        .eq("organization_id", currentOrganization.id)
         .eq("published", true)
         .gt("quantity_in_stock", 0)
         .order("featured", { ascending: false })
-        .order("name")
+        .order("name");
+    },
+    {
+      enabled: !!currentOrganization,
+    }
   );
 }
 
 /**
- * Hook for featured products list (limited) with caching
+ * Hook for featured products list (limited) with caching (MULTI-TENANT)
  */
 export function useFeaturedProducts(limit = 8) {
+  const { currentOrganization } = useSaaS();
+
   return useSupabaseQuery<Product[]>(
-    "featured-products",
-    async () =>
-      await supabase
+    ["featured-products", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
         .from("products")
         .select("*")
+        .eq("organization_id", currentOrganization.id)
         .gt("quantity_in_stock", 0)
         .order("quantity_in_stock", { ascending: true })
-        .limit(limit)
+        .limit(limit);
+    },
+    {
+      enabled: !!currentOrganization,
+    }
   );
 }
 
 /**
- * Hook for initial investments data with caching
+ * Hook for initial investments data with caching (MULTI-TENANT)
  */
 export function useInitialInvestments() {
+  const { currentOrganization } = useSaaS();
+
   return useSupabaseQuery<any[]>(
-    "initial-investments",
-    async () => await supabase.from("initial_investments").select("*")
+    ["initial-investments", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
+        .from("initial_investments")
+        .select("*")
+        .eq("organization_id", currentOrganization.id);
+    },
+    {
+      enabled: !!currentOrganization,
+    }
   );
 }
 
 /**
- * Hook for returns data with caching
+ * Hook for returns data with caching (MULTI-TENANT)
  */
 export function useReturns() {
+  const { currentOrganization } = useSaaS();
+
   return useSupabaseQuery<any[]>(
-    "returns",
-    async () =>
-      await supabase
+    ["returns", currentOrganization?.id],
+    async () => {
+      if (!currentOrganization) return { data: [], error: null };
+      return await (supabase as any)
         .from("returns")
         .select("*")
-        .order("return_date", { ascending: false })
+        .eq("organization_id", currentOrganization.id)
+        .order("return_date", { ascending: false });
+    },
+    {
+      enabled: !!currentOrganization,
+    }
   );
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "774133006072",
+    "project_id": "lenzro-saas-2025",
+    "storage_bucket": "lenzro-saas-2025.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774133006072:android:4d465e7e2770648e41c50d",
+        "android_client_info": {
+          "package_name": "com.lenzro.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLs7aUWo-LYjbZQSVo2Qbhd7lbEY20Mss"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
