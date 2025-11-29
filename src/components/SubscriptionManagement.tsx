@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSaaS } from "../contexts/SaaSContext";
-import { Check, Zap, Crown, AlertCircle, TrendingUp } from "lucide-react";
+import { Check, AlertCircle, X } from "lucide-react";
 import type { SubscriptionPlan, BillingCycle } from "../types/saas.types";
 
 export default function SubscriptionManagement() {
@@ -32,21 +32,6 @@ export default function SubscriptionManagement() {
     }
   };
 
-  const getPlanIcon = (slug: string) => {
-    switch (slug) {
-      case "free":
-        return <Check className="w-8 h-8 text-gray-500" />;
-      case "basic":
-        return <Zap className="w-8 h-8 text-blue-600" />;
-      case "professional":
-        return <TrendingUp className="w-8 h-8 text-primary-600" />;
-      case "enterprise":
-        return <Crown className="w-8 h-8 text-purple-600" />;
-      default:
-        return <Check className="w-8 h-8 text-gray-500" />;
-    }
-  };
-
   const getPlanPrice = (plan: SubscriptionPlan) => {
     return billingCycle === "monthly"
       ? plan.price_monthly_kes || 0
@@ -65,84 +50,82 @@ export default function SubscriptionManagement() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
+    <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Subscription</h1>
-            <p className="text-gray-600 mt-2">
-              {isTrialActive
-                ? `Trial ends ${new Date(
-                    currentOrganization?.trial_ends_at || ""
-                  ).toLocaleDateString()}`
-                : "Manage your subscription and billing"}
-            </p>
-          </div>
-
-          {/* Billing Cycle Toggle */}
-          <div className="flex items-center bg-gray-100 rounded-lg p-1">
-            <button
-              onClick={() => setBillingCycle("monthly")}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                billingCycle === "monthly"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBillingCycle("yearly")}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                billingCycle === "yearly"
-                  ? "bg-white text-gray-900 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              Yearly
-              <span className="ml-2 text-xs text-green-600 font-semibold">
-                Save 17%
-              </span>
-            </button>
-          </div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Subscription</h1>
+          <p className="text-gray-500 mt-1 text-sm">
+            {isTrialActive
+              ? `Trial ends ${new Date(
+                  currentOrganization?.trial_ends_at || ""
+                ).toLocaleDateString()}`
+              : "Manage your subscription and billing"}
+          </p>
         </div>
 
-        {/* Trial Warning */}
-        {isTrialActive && (
-          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-amber-900 font-medium">Trial Period Active</p>
-              <p className="text-amber-700 text-sm mt-1">
-                Your trial ends on{" "}
-                {new Date(
-                  currentOrganization?.trial_ends_at || ""
-                ).toLocaleDateString()}
-                . Upgrade now to continue using all features.
-              </p>
-            </div>
-          </div>
-        )}
+        {/* Billing Cycle Toggle */}
+        <div className="flex items-center bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => setBillingCycle("monthly")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              billingCycle === "monthly"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setBillingCycle("yearly")}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              billingCycle === "yearly"
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Yearly
+            <span className="ml-2 text-xs text-green-600 font-medium">
+              -17%
+            </span>
+          </button>
+        </div>
       </div>
+
+      {/* Trial Warning */}
+      {isTrialActive && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-amber-800 font-medium text-sm">Trial Period Active</p>
+            <p className="text-amber-700 text-sm mt-1">
+              Your trial ends on{" "}
+              {new Date(
+                currentOrganization?.trial_ends_at || ""
+              ).toLocaleDateString()}
+              . Upgrade to continue using all features.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Current Plan Overview */}
       {subscription && (
-        <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex justify-between items-start">
+        <div className="bg-gray-900 rounded-xl p-6 text-white">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <p className="text-blue-100 text-sm font-medium uppercase tracking-wide">
+              <p className="text-gray-400 text-sm font-medium uppercase tracking-wide">
                 Current Plan
               </p>
-              <h2 className="text-3xl font-bold mt-2">
+              <h2 className="text-2xl font-semibold mt-1 capitalize">
                 {currentOrganization?.subscription_tier || "Free"}
               </h2>
-              <p className="text-blue-100 mt-2">
+              <p className="text-gray-400 mt-1 text-sm">
                 Renews on{" "}
                 {new Date(subscription.current_period_end).toLocaleDateString()}
               </p>
             </div>
-            <button className="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg font-medium transition-colors">
+            <button className="bg-white/10 hover:bg-white/15 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
               Manage Billing
             </button>
           </div>
@@ -150,81 +133,73 @@ export default function SubscriptionManagement() {
           {/* Usage Stats */}
           {usageStats && (
             <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm">Users</p>
-                <p className="text-2xl font-bold mt-1">
-                  {usageStats.current_users} /{" "}
-                  {usageStats.max_users === 999999 ? "∞" : usageStats.max_users}
+              <div className="bg-white/5 rounded-lg p-4">
+                <p className="text-gray-400 text-xs font-medium">Users</p>
+                <p className="text-lg font-semibold mt-1">
+                  {usageStats.current_users}
+                  <span className="text-gray-500 text-sm font-normal">
+                    {" "}/ {usageStats.max_users === 999999 ? "∞" : usageStats.max_users}
+                  </span>
                 </p>
-                <div className="mt-2 bg-white/20 rounded-full h-2 overflow-hidden">
+                <div className="mt-2 bg-white/10 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-white h-full rounded-full transition-all"
+                    className="bg-white h-full rounded-full"
                     style={{
-                      width: `${Math.min(
-                        usageStats.users_usage_percentage,
-                        100
-                      )}%`,
+                      width: `${Math.min(usageStats.users_usage_percentage, 100)}%`,
                     }}
                   />
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm">Products</p>
-                <p className="text-2xl font-bold mt-1">
-                  {usageStats.current_products} /{" "}
-                  {usageStats.max_products === 999999
-                    ? "∞"
-                    : usageStats.max_products}
+              <div className="bg-white/5 rounded-lg p-4">
+                <p className="text-gray-400 text-xs font-medium">Products</p>
+                <p className="text-lg font-semibold mt-1">
+                  {usageStats.current_products}
+                  <span className="text-gray-500 text-sm font-normal">
+                    {" "}/ {usageStats.max_products === 999999 ? "∞" : usageStats.max_products}
+                  </span>
                 </p>
-                <div className="mt-2 bg-white/20 rounded-full h-2 overflow-hidden">
+                <div className="mt-2 bg-white/10 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-white h-full rounded-full transition-all"
+                    className="bg-white h-full rounded-full"
                     style={{
-                      width: `${Math.min(
-                        usageStats.products_usage_percentage,
-                        100
-                      )}%`,
+                      width: `${Math.min(usageStats.products_usage_percentage, 100)}%`,
                     }}
                   />
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm">Orders (This Month)</p>
-                <p className="text-2xl font-bold mt-1">
-                  {usageStats.current_orders_this_month} /{" "}
-                  {usageStats.max_orders_per_month === 999999
-                    ? "∞"
-                    : usageStats.max_orders_per_month}
+              <div className="bg-white/5 rounded-lg p-4">
+                <p className="text-gray-400 text-xs font-medium">Orders / Month</p>
+                <p className="text-lg font-semibold mt-1">
+                  {usageStats.current_orders_this_month}
+                  <span className="text-gray-500 text-sm font-normal">
+                    {" "}/ {usageStats.max_orders_per_month === 999999 ? "∞" : usageStats.max_orders_per_month}
+                  </span>
                 </p>
-                <div className="mt-2 bg-white/20 rounded-full h-2 overflow-hidden">
+                <div className="mt-2 bg-white/10 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-white h-full rounded-full transition-all"
+                    className="bg-white h-full rounded-full"
                     style={{
-                      width: `${Math.min(
-                        usageStats.orders_usage_percentage,
-                        100
-                      )}%`,
+                      width: `${Math.min(usageStats.orders_usage_percentage, 100)}%`,
                     }}
                   />
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-blue-100 text-sm">Storage</p>
-                <p className="text-2xl font-bold mt-1">
-                  {usageStats.current_storage_gb} GB /{" "}
-                  {usageStats.max_storage_gb} GB
+              <div className="bg-white/5 rounded-lg p-4">
+                <p className="text-gray-400 text-xs font-medium">Storage</p>
+                <p className="text-lg font-semibold mt-1">
+                  {usageStats.current_storage_gb} GB
+                  <span className="text-gray-500 text-sm font-normal">
+                    {" "}/ {usageStats.max_storage_gb} GB
+                  </span>
                 </p>
-                <div className="mt-2 bg-white/20 rounded-full h-2 overflow-hidden">
+                <div className="mt-2 bg-white/10 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-white h-full rounded-full transition-all"
+                    className="bg-white h-full rounded-full"
                     style={{
-                      width: `${Math.min(
-                        usageStats.storage_usage_percentage,
-                        100
-                      )}%`,
+                      width: `${Math.min(usageStats.storage_usage_percentage, 100)}%`,
                     }}
                   />
                 </div>
@@ -236,218 +211,154 @@ export default function SubscriptionManagement() {
 
       {/* Available Plans */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Available Plans
         </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...subscriptionPlans]
             .sort((a, b) => (a.display_order || 0) - (b.display_order || 0))
             .map((plan) => {
               const isCurrent = isCurrentPlan(plan.slug);
               const isUpgrade = isPlanUpgrade(plan.slug);
               const price = getPlanPrice(plan);
-
-              const isPremium =
-                plan.slug === "professional" || plan.slug === "enterprise";
+              const isRecommended = plan.slug === "professional" && !isCurrent;
 
               return (
                 <div
                   key={plan.id}
-                  className={`relative bg-white rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden ${
+                  className={`relative bg-white rounded-lg border transition-shadow hover:shadow-md ${
                     isCurrent
-                      ? "ring-2 ring-primary-500 border-2 border-primary-500"
-                      : "border border-gray-200"
+                      ? "border-gray-900 ring-1 ring-gray-900"
+                      : isRecommended
+                      ? "border-primary-500 ring-1 ring-primary-500"
+                      : "border-gray-200"
                   }`}
                 >
-                  {/* Top accent bar */}
-                  <div
-                    className={`h-2 ${
-                      plan.slug === "free"
-                        ? "bg-gradient-to-r from-gray-400 to-gray-500"
-                        : plan.slug === "basic"
-                        ? "bg-gradient-to-r from-blue-400 to-blue-600"
-                        : plan.slug === "professional"
-                        ? "bg-gradient-to-r from-primary-500 to-primary-700"
-                        : "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500"
-                    }`}
-                  ></div>
-
-                  <div className="p-8">
-                    {/* Current Plan Badge */}
+                  <div className="p-5">
+                    {/* Badges */}
                     {isCurrent && (
-                      <div className="absolute top-4 right-4">
-                        <span className="bg-primary-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                          ✓ ACTIVE
-                        </span>
-                      </div>
+                      <span className="inline-block bg-gray-900 text-white text-xs font-medium px-2 py-1 rounded mb-3">
+                        Current
+                      </span>
                     )}
-
-                    {/* Recommended Badge */}
-                    {plan.slug === "professional" && !isCurrent && (
-                      <div className="absolute top-4 right-4">
-                        <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">
-                          ⭐ POPULAR
-                        </span>
-                      </div>
+                    {isRecommended && (
+                      <span className="inline-block bg-primary-600 text-white text-xs font-medium px-2 py-1 rounded mb-3">
+                        Recommended
+                      </span>
+                    )}
+                    {!isCurrent && !isRecommended && (
+                      <div className="h-6 mb-3" />
                     )}
 
                     {/* Plan Header */}
-                    <div className="text-center mb-6">
-                      <div
-                        className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 ${
-                          plan.slug === "free"
-                            ? "bg-gray-100"
-                            : plan.slug === "basic"
-                            ? "bg-blue-50"
-                            : plan.slug === "professional"
-                            ? "bg-primary-50"
-                            : "bg-gradient-to-br from-purple-50 to-pink-50"
-                        }`}
-                      >
-                        {getPlanIcon(plan.slug)}
-                      </div>
-
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                        {plan.name}
-                      </h3>
-                      <p className="text-gray-500 text-sm">
-                        {plan.description}
-                      </p>
-                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {plan.name}
+                    </h3>
+                    <p className="text-gray-500 text-sm mt-1 line-clamp-2 min-h-[40px]">
+                      {plan.description}
+                    </p>
 
                     {/* Price */}
-                    <div className="text-center py-6 border-y border-gray-100">
+                    <div className="mt-4 mb-5">
                       {price === 0 ? (
                         <div>
-                          <div className="text-5xl font-black text-gray-900 mb-2">
-                            FREE
-                          </div>
-                          <div className="text-sm text-gray-500 font-medium">
-                            Forever free plan
-                          </div>
+                          <span className="text-3xl font-semibold text-gray-900">
+                            Free
+                          </span>
+                          <p className="text-gray-500 text-sm mt-1">
+                            No credit card required
+                          </p>
                         </div>
                       ) : (
                         <div>
-                          <div className="flex items-baseline justify-center">
-                            <span className="text-2xl font-semibold text-gray-400">
-                              KES
-                            </span>
-                            <span className="text-5xl font-black text-gray-900 mx-2">
+                          <div className="flex items-baseline">
+                            <span className="text-sm text-gray-500">KES</span>
+                            <span className="text-3xl font-semibold text-gray-900 ml-1">
                               {price.toLocaleString()}
                             </span>
-                          </div>
-                          <div className="text-sm text-gray-500 font-medium mt-2">
-                            per {billingCycle === "monthly" ? "month" : "year"}
+                            <span className="text-gray-500 text-sm ml-1">
+                              /{billingCycle === "monthly" ? "mo" : "yr"}
+                            </span>
                           </div>
                           {billingCycle === "yearly" &&
                             plan.price_yearly_kes &&
                             plan.price_yearly_kes > 0 &&
                             plan.price_monthly_kes && (
-                              <div className="mt-2 inline-flex items-center gap-1 bg-green-50 text-green-700 text-xs font-bold px-3 py-1 rounded-full">
-                                <span>💰</span>
-                                <span>
-                                  Save KES{" "}
-                                  {(
-                                    plan.price_monthly_kes * 12 -
-                                    plan.price_yearly_kes
-                                  ).toLocaleString()}
-                                </span>
-                              </div>
+                              <p className="text-green-600 text-sm mt-1">
+                                Save KES{" "}
+                                {(
+                                  plan.price_monthly_kes * 12 -
+                                  plan.price_yearly_kes
+                                ).toLocaleString()}
+                              </p>
                             )}
                         </div>
                       )}
                     </div>
 
                     {/* Features */}
-                    <ul className="mt-6 space-y-3">
-                      <li className="flex items-start text-sm text-gray-700">
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                          <Check className="w-3 h-3 text-accent-600" />
-                        </div>
+                    <ul className="space-y-2.5 mb-5">
+                      <li className="flex items-center text-sm text-gray-600">
+                        <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                         <span>
-                          <span className="font-semibold text-gray-900">
-                            {plan.max_users === -1 ||
-                            plan.max_users === 999999 ||
-                            plan.max_users > 1000
-                              ? "Unlimited"
-                              : plan.max_users}
-                          </span>{" "}
-                          team {plan.max_users === 1 ? "member" : "members"}
+                          {plan.max_users === -1 ||
+                          plan.max_users === 999999 ||
+                          plan.max_users > 1000
+                            ? "Unlimited"
+                            : plan.max_users}{" "}
+                          {plan.max_users === 1 ? "user" : "users"}
                         </span>
                       </li>
-                      <li className="flex items-start text-sm text-gray-700">
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                          <Check className="w-3 h-3 text-accent-600" />
-                        </div>
+                      <li className="flex items-center text-sm text-gray-600">
+                        <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                         <span>
-                          <span className="font-semibold text-gray-900">
-                            {plan.max_products === -1 ||
-                            plan.max_products === 999999 ||
-                            plan.max_products > 10000
-                              ? "Unlimited"
-                              : plan.max_products.toLocaleString()}
-                          </span>{" "}
+                          {plan.max_products === -1 ||
+                          plan.max_products === 999999 ||
+                          plan.max_products > 10000
+                            ? "Unlimited"
+                            : plan.max_products.toLocaleString()}{" "}
                           products
                         </span>
                       </li>
-                      <li className="flex items-start text-sm text-gray-700">
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                          <Check className="w-3 h-3 text-accent-600" />
-                        </div>
-                        <span>
-                          <span className="font-semibold text-gray-900">
-                            {plan.max_storage_gb} GB
-                          </span>{" "}
-                          storage
-                        </span>
+                      <li className="flex items-center text-sm text-gray-600">
+                        <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                        <span>{plan.max_storage_gb} GB storage</span>
                       </li>
                       {plan.max_orders_per_month !== null &&
                         plan.max_orders_per_month !== undefined && (
-                          <li className="flex items-start text-sm text-gray-700">
-                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                              <Check className="w-3 h-3 text-accent-600" />
-                            </div>
+                          <li className="flex items-center text-sm text-gray-600">
+                            <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                             <span>
-                              <span className="font-semibold text-gray-900">
-                                {plan.max_orders_per_month === -1 ||
-                                plan.max_orders_per_month === 999999 ||
-                                plan.max_orders_per_month > 10000
-                                  ? "Unlimited"
-                                  : plan.max_orders_per_month.toLocaleString()}
-                              </span>{" "}
+                              {plan.max_orders_per_month === -1 ||
+                              plan.max_orders_per_month === 999999 ||
+                              plan.max_orders_per_month > 10000
+                                ? "Unlimited"
+                                : plan.max_orders_per_month.toLocaleString()}{" "}
                               orders/month
                             </span>
                           </li>
                         )}
                       {plan.features?.advanced_reports && (
-                        <li className="flex items-start text-sm text-gray-700">
-                          <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                            <Check className="w-3 h-3 text-accent-600" />
-                          </div>
+                        <li className="flex items-center text-sm text-gray-600">
+                          <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                           <span>Advanced reports</span>
                         </li>
                       )}
                       {plan.features?.api_access && (
-                        <li className="flex items-start text-sm text-gray-700">
-                          <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                            <Check className="w-3 h-3 text-accent-600" />
-                          </div>
+                        <li className="flex items-center text-sm text-gray-600">
+                          <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                           <span>API access</span>
                         </li>
                       )}
                       {plan.features?.priority_support && (
-                        <li className="flex items-start text-sm text-gray-700">
-                          <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                            <Check className="w-3 h-3 text-accent-600" />
-                          </div>
+                        <li className="flex items-center text-sm text-gray-600">
+                          <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                           <span>Priority support</span>
                         </li>
                       )}
                       {plan.features?.custom_branding && (
-                        <li className="flex items-start text-sm text-gray-700">
-                          <div className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-100 flex items-center justify-center mr-3 mt-0.5">
-                            <Check className="w-3 h-3 text-accent-600" />
-                          </div>
+                        <li className="flex items-center text-sm text-gray-600">
+                          <Check className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                           <span>Custom branding</span>
                         </li>
                       )}
@@ -459,24 +370,20 @@ export default function SubscriptionManagement() {
                         !isCurrent && isUpgrade && handleUpgrade(plan)
                       }
                       disabled={isCurrent || !isUpgrade}
-                      className={`w-full mt-8 py-4 rounded-xl font-bold text-base transition-all duration-300 ${
+                      className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors ${
                         isCurrent
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : isUpgrade
-                          ? plan.slug === "professional"
-                            ? "bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-                            : plan.slug === "enterprise"
-                            ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-                            : "bg-primary-600 hover:bg-primary-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-                          : "bg-gray-600 hover:bg-gray-700 text-white shadow-sm hover:shadow-md"
+                          ? isRecommended
+                            ? "bg-primary-600 hover:bg-primary-700 text-white"
+                            : "bg-gray-900 hover:bg-gray-800 text-white"
+                          : "bg-gray-100 hover:bg-gray-200 text-gray-600"
                       }`}
                     >
                       {isCurrent
-                        ? "✓ Current Plan"
+                        ? "Current Plan"
                         : isUpgrade
-                        ? plan.slug === "free"
-                          ? "Get Started Free"
-                          : `Upgrade to ${plan.name}`
+                        ? `Upgrade to ${plan.name}`
                         : "Downgrade"}
                     </button>
                   </div>
@@ -489,55 +396,61 @@ export default function SubscriptionManagement() {
       {/* Upgrade Modal */}
       {showUpgradeModal && selectedPlan && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <TrendingUp className="w-8 h-8 text-green-500" />
-              <h3 className="text-2xl font-bold text-gray-900">Upgrade Plan</h3>
-            </div>
-
-            <p className="text-gray-600 mb-6">
-              You're upgrading to{" "}
-              <span className="font-semibold">{selectedPlan.name}</span> plan.
-            </p>
-
-            <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-700">Plan:</span>
-                <span className="font-semibold text-gray-900">
-                  {selectedPlan.name}
-                </span>
-              </div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-700">Billing:</span>
-                <span className="font-semibold text-gray-900 capitalize">
-                  {billingCycle}
-                </span>
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                <span className="text-gray-700 font-semibold">Total:</span>
-                <span className="text-2xl font-bold text-gray-900">
-                  ${getPlanPrice(selectedPlan)}/
-                  {billingCycle === "monthly" ? "mo" : "yr"}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
+          <div className="bg-white rounded-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Upgrade to {selectedPlan.name}
+              </h3>
               <button
                 onClick={() => setShowUpgradeModal(false)}
-                className="flex-1 py-3 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm">Plan</span>
+                  <span className="font-medium text-gray-900">
+                    {selectedPlan.name}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600 text-sm">Billing cycle</span>
+                  <span className="font-medium text-gray-900 capitalize">
+                    {billingCycle}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-200">
+                  <span className="text-gray-900 font-medium">Total</span>
+                  <span className="text-xl font-semibold text-gray-900">
+                    KES {getPlanPrice(selectedPlan).toLocaleString()}
+                    <span className="text-sm font-normal text-gray-500">
+                      /{billingCycle === "monthly" ? "mo" : "yr"}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 p-5 border-t border-gray-200">
+              <button
+                onClick={() => setShowUpgradeModal(false)}
+                className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmUpgrade}
-                className="flex-1 py-3 rounded-lg font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
+                className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-gray-900 text-white hover:bg-gray-800 transition-colors"
               >
                 Confirm Upgrade
               </button>
             </div>
 
-            <p className="text-xs text-gray-500 text-center mt-4">
+            <p className="text-xs text-gray-500 text-center pb-5">
               Payment integration coming in Phase 3
             </p>
           </div>
